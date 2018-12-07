@@ -24,9 +24,9 @@ from copy import copy
 
 
 class Food(object): 
-  
-  #certain objects are classified as Foods to enable a general definition of all processes that can be done to them, e.g. chop carrots, boil carrots, peel carrots etc 
-  
+"""Class to enable a general definition of all processes that can 
+be done to them, e.g. chop carrots, boil carrots, peel carrots.
+"""  
   
   def __init__(self,name,state,chopable,mashable,peelable,soakable,bakeable,boilable,fryable,roastable):
     self.name = name
@@ -43,7 +43,9 @@ class Food(object):
   def get_info(self):
     return self.amount + '\n ' + self.state + '\n' + self.name 
     
-  #the following class functions essentially allow an object to be considered in various forms: raw broccoli, chopped broccoli etc, forms which differ only slightly
+  #The following class functions essentially allow an object to be considered 
+  #in various forms: raw broccoli, chopped broccoli etc, forms which 
+  #differ only slightly
     
   def chop(self):
     self.chopable = False
@@ -53,7 +55,6 @@ class Food(object):
     else:
       self.state = 'chopped ' + self.state
     
-      
   def mash(self):
     self.chopable = False
     self.mashable = False
@@ -77,7 +78,6 @@ class Food(object):
     else:
       self.state = 'soaked ' + self.state
       
-      
   def bake(self):
     self.chopable = False
     self.mashable = False
@@ -96,8 +96,7 @@ class Food(object):
       self.state = 'boiled'
     else:
       self.state = 'boiled ' + self.state
-    
-    
+     
   def fry(self):
     self.soakable = False 
     self.boilable = False
@@ -119,8 +118,6 @@ class Food(object):
     else:
       self.state = 'roasted ' + self.state
     
-    
-    
   def description(self): 
     if self.state == '':
       return self.state + self.name
@@ -128,7 +125,9 @@ class Food(object):
       return self.state + ' ' + self.name
     
     
-# what follows defines subclasses of Foods which agree on many properties, the properties on which they may not agree  are left open to be defined for each object
+#Define subclasses of Foods which agree on many properties.
+#The properties on which they may not agree are left open 
+#to be defined for each object.
     
 class Vegetable(Food):
   
@@ -201,10 +200,9 @@ class Nut(Food):
     self.roastable = True
                                 
                                 
-  # a definition of the objects used in this programme, note these are simply shortcuts for defining processes and are not equivalent to ingredients 
+  #Define the objects used in this programme. Note these are simply 
+  #shortcuts for defining processes and are not equivalent to ingredients 
   
-  #chop,mash,peel,soak,bake,boil,fry,roast
-    
 carrot = Vegetable('carrot',True,600)
 bean = Food('beans','dried',False,False,False,True,False,False,False,False)
 broccoli = Vegetable('broccoli',False,480)
@@ -233,10 +231,7 @@ walnut = Nut('walnut')
 avocado = Food('avocado','',False,True,True,False,False,False,False,False)
 
 
-
-
 foods = [carrot,bean,broccoli,peppers,cauliflower,asparagus,onion,tomato,potato,rosemary,basil,parsley,thyme,noodles,rice,pasta,lentils,quinoa,garlic,avocado,sweet_potato]
-
 
 
 vegetables = []
@@ -254,8 +249,7 @@ roast = {}
 strain = {}
 
 
-# the list of 'specialised' processes is defined first, the processes arising from object definitions are appended later
-
+#List of 'specialised', hard-coded processes.
 
 rinse = {'number': 1, 'in': ['tinned beans'], 'out': ['rinsed beans'], 'time': 60, 'direction': 'rinse the beans','f time': 0}
 serve_salad = {'number': 2, 'in': ['chopped carrot', 'rinsed beans'],'out': ['bean salad'],'time': 30,'direction': 'add the carrots and beans and serve','f time': 0}
@@ -280,27 +274,25 @@ skills = [bring_to_boil,mix_dahl,rinse,serve_salad,toast,soldiers,serve_guac,fry
 
 
 
-
-
-def hours_minutes_seconds(t):
-  # t is an amount of time given in seconds, returns the same amount of time given in hrs, mins and secs  
-  secondcount = t % 60
-  minutecount = (t % 3600 - secondcount)/60
-  hourcount = (t - secondcount - (minutecount *60))/3600
-  if t == 0:
+def hours_minutes_seconds(time_secs):
+  #Convert time give in seconds to hhmmss format.""" 
+  secondcount = time_secs % 60
+  minutecount = (time_secs % 3600 - secondcount)/60
+  hourcount = (time_secs - secondcount - (minutecount *60))/3600
+  
+  if time_secs == 0:
     return 0 
+  
   if hourcount == 0:
     hours = ''
   elif hourcount == 1:
     hours = str(hourcount) + 'hr'
   else:
     hours = str(hourcount) + 'hrs'
-    
   if minutecount == 1:
     minutes = str(minutecount) + 'min'
   else:
-    minutes = str(minutecount) + 'mins'
-    
+    minutes = str(minutecount) + 'mins'   
   if secondcount == 0:
     seconds = ''
   elif secondcount == 1:
@@ -310,12 +302,12 @@ def hours_minutes_seconds(t):
   return hours + minutes + seconds 
   
   
+#List of processes arising from object definitions.
 
-next_number = 18
+next_number = len(skills)
 foods_temp = deepcopy(foods)
 for i in range(5):
   
-
   if foods_temp == []:
     break
   foods1 = []
@@ -371,7 +363,9 @@ for i in range(5):
 
   
 
-  # synoyms are managed by 'ghost' processes which convert between synonymous terms, contain empty direction and 0 time     
+#Synoyms are managed by 'ghost' processes which convert between 
+#synonymous terms, contain empty direction and 0 time.
+  
 synonyms = []
    
 synonyms = [(['mashed avocado'],['guacamole']),(['fried chopped potato'],['chips']),(['fried chopped peeled sweet potato'],['sweet potato fries'])]  
@@ -380,8 +374,13 @@ for x in foods:
     if type(x) is Vegetable and type(y) is Vegetable and not x.name == y.name and x.state == 'chopped' and y.state == 'chopped':
       synonyms.append(([x.description(),y.description()],['chopped vegetables']))
       
-# the above allows the automatic generation of 'chopped vegetables' for example, but requires some tweaking to allow for more than two vegetable types to count as chopped vegetables, e.g. broccoli, carrot and onion 
-# the conversion is made only in the chopped state because it is felt that, practically speaking, this is the most likely stage at which one would begin treating many vegetables as a single ingredient/description, however an increase in generality would still be a worthwhile step 
+#Above allows the automatic generation of 'chopped vegetables' 
+#for example, but requires some tweaking to allow for more than two 
+#vegetable types to count as chopped vegetables, e.g. broccoli, carrot 
+#and onion.The conversion is made only in the chopped state because it 
+#is felt that, practically speaking, this is the most likely stage at 
+#which one would begin treating many vegetables as a single ingredient/
+#description. 
     
 
 ghost = []
@@ -391,7 +390,7 @@ for x in synonyms:
   next_number +=1 
 skills += ghost
 
-# the following appends the processes arising from object definitions
+#Append the processes arising from object definitions.
 
 for x in chop:
   skills.append(chop[x])
@@ -418,11 +417,11 @@ supplies = ['raw carrot','tinned beans','bread','avocado','tap water','lentils',
 
 
 
-#  the following 6 functions enable a plan of a recipe to be encoded by a single integer, this is a sort of work around of the fact that, in python, lists are unhashable, it allows python to perform certain actions that cannot be performed on the alternative form of a plan (a list of dictionaries)--while these functions are not used in the current version of the code, they were helpful in previous versions and are included in case they prove useful in the future 
+# The following 6 functions enable a plan of a recipe to be encoded by a single integer, this is a sort of work around of the fact that, in python, lists are unhashable, it allows python to perform certain actions that cannot be performed on the alternative form of a plan (a list of dictionaries)--while these functions are not used in the current version of the code, they were helpful in previous versions and are included in case they prove useful in the future 
 
 
 def list_of_primes(i):
-  # returns a list of the first i primes
+  """Return a list of the first i primes."""
   if i == 0:
     return []
     
@@ -443,47 +442,63 @@ def list_of_primes(i):
           break
         
         
-def g_num(l):
-  # transforms a list of numbers into a single number through a technique similar to part of that of Goedel Numbering 
-  g = list_of_primes(len(l))
+def g_num(list_nums):
+  """Transforms a list of numbers into a single number via Goedel 
+  Numbering.
+  
+  Args: 
+    list_nums (list): numbers to be converted to single number
+  """
+  
+  g = list_of_primes(len(list_nums))
   g_num = 1 
-  for i in range(len(l)):
-    g_num *= g[i]**l[i]
+  for i in range(len(list_nums)):
+    g_num *= g[i]**list_nums[i]
   return g_num  
   
 def recipe_num_list(plan):
-  # relates each plan to a unique list of integers 
-  l = []
+  """Relates each recipe plan to a unique list of integers.
+  
+    Args:
+    plan: (list) a list of processes in a recipe
+    """
+  
+  list_procs = []
   for x in plan:
-    l.append(x['number'])
-  return l 
+    list_procs.append(x['number'])
+  return list_procs
   
-def recipe_num(plan):
-  # relates each plan to a unique integer
-  l = recipe_num_list(plan)
-  return g_num(l)
+def recipe_num(recipe_plan):
+  """Relates each recipe plan to a unique integer.
+  
+  Args:
+    plan: (list) a list of processes in a recipe
+    """
+  
+  list_of_nums = recipe_num_list(recipe_plan)
+  return g_num(list_of_nums)
   
   
-def plan_from_num(n):
-  # the inverse function of recipe_num, relates each integer to a unique list of processes, of course the majority of these lists will not be meaningful
-  g = list_of_primes(20)
+def plan_from_num(identifying_int):
+  """Inverse function of recipe_num. Relates each integer to a 
+  unique list of processes, of course the majority of these lists 
+  will not describe meaningful recipes.
+  """
+  
+  primes = list_of_primes(20)
   plan_num = []
-  for x in g:
-    if n == 1:
+  for prime in primes:
+    if indentifying_int == 1:
       break
-
     times = 0
     while True:
-      if n%x == 0:
-
+      if identifying_ing%prime == 0:
         times +=1 
-        n = n/x 
-
+        identifying_int = identifying_int/prime
       else:
-
         plan_num.append(times)
-
         break
+        
   plan = []
   for num in plan_num:
     plan.append(find_number(num))
@@ -491,66 +506,57 @@ def plan_from_num(n):
   return plan 
 
   
-def find_number(a):
-  # returns the unique process with number equal to a 
+def find_number(proc_int):
+  """Returns the unique process with number equal to `proc_int'.""" 
   for x in skills:
-    if x['number'] == a:
+    if x['number'] == proc_int:
       return x
-      
 
-
-
-
-
+#Initialize list of dishes that can be made from gived ingredients.
 can_make = []
 
-
-for x in boil:
-  if not type(boil[x]) is dict:
-    print boil[x] 
-   
-
-# the set of all (parts of) dishes that are recognised by the current programme--this is not equivalent to the dishes that can be made with the given ingredients however, additional ingredients may be required
+#Set of all (parts of) dishes that are recognised by the current 
+#programme. This is not equivalent to the dishes that can be made 
+#with the given ingredients, additional ingredients may be required
     
 for x in skills:
   can_make = set(can_make).union(set(x['out']))
   
+#The following functions build up a definition of the relation that 
+#holds between two processes when one requires (cannot be performed 
+#before) the other--as the processes are dictionaries and so unhashable, 
+#they are represented in the set 'requirees' by a unique identifying 
+#number, a number which has the dictionary key 'number'
 
-# the following functions build up a definition of the relation that holds between two processes when one requires (cannot be performed before) the other--as the processes are dictionaries and so unhashable, they are represented in the set 'requirees' by a unique identifying number, a number which has the dictionary key 'number'
 
-def direct_requires(a,b):
-  return not set(a['in']).intersection(set(b['out'])) == set([])
-  
-  
-def direct_dependent(a,b):
-  return direct_requires(a,b) or direct_requires(b,a)
-
+def direct_requires(proc_1,proc_2):
+  return not set(proc_1['in']).intersection(set(proc_2['out'])) == set([])
+    
+def direct_dependent(proc_1,proc_2):
+  return direct_requires(proc_1,proc_2) or direct_requires(proc_2,proc_1)
 
 direct_requirees = set([(a['number'],b['number']) for a in skills for b in skills if direct_requires(a,b)])
 
 
-def transitive_closure(s):
-  closure = set(s)
+def transitive_closure(set_):
+  closure = set(set_)
   while True:
-    new_elements = set((a,b) for (a,x) in closure for (z,b) in s if x == z)
+    new_elements = set((a,b) for (a,x) in closure for (z,b) in set_ if x == z)
     new_closure = closure | new_elements
     if new_closure == closure:
       break
     closure = new_closure
   return closure
     
-
+  
 base_requirees = transitive_closure(direct_requirees)
-
 requirees = copy(direct_requirees)
 
 def dependent(a,b):
   return (a['number'],b['number']) in requirees or (b['number'], a['number']) in requirees
 
-
-
 def best(plan):
-  
+  """Test whether the recipe described in `plan' is temporally optimized."""
   if len(plan) == 1:
     return True 
     
@@ -558,40 +564,49 @@ def best(plan):
     if x['f time'] >  0:
       return False
   
-  return True 
-    
+  return True
+  
    
-  
-
-
-  
-    # takes a plan as argument and returns the quickest way this plan could be performed without altering the order of processes, i.e. determines which processes it would be efficient to perform at the same time, and collapses them together into a 'derived process' 
-
-
 def concurrent_compression(l):
-
+  """Temporally optimize a recipe plan within the given order of processes.
+  Determines which processes it would be efficient to perform at the same 
+  time, and collapses them together into a 'derived process'
+  
+  Args: 
+    l - list of processes in a recipe
+  """
+  
   temp_next = copy(next_number)
   modl = [item for item in deepcopy(l) if item['time'] > 0]
   size = len(modl)
   count = 0 
   requirees = copy(base_requirees)    
-  # it is necessary to reset the requirees set on every call of the current function, otherwise there is a risk of 'cross contamination' where a derived process is judged to have the dependencies of a previous derived process (derived process from previous call of temporal_compression) that had the same number  
+  #Reset requirees, otherwise there is a risk of 'cross contamination' 
+  #where a derived process is judged to have the dependencies of a 
+  #previous derived process (derived process from previous call of 
+  #temporal_compression) that had the same number.
   
   while True:
     
-    # adjoin all possible concurrent processes until nothing is adjoined on a full iteration through modl 
+    #Adjoin all possible concurrent processes until nothing is 
+    #adjoined on a full iteration through `modl'.
     i = 2
     while True:
       if i > size:
         global requirees  #necessary for use of requirees in the 'best' function 
         return modl
       item = modl[-i]     
-      # begins from last in list, considering all items in front of it that can be adjoined (eaten), this direction is taken to allow derived processes themselves to be eaten by another process that occurs behind (before) them 
+      # For each processes, consider all following processes that it can
+      #combine with(`eaten'). Iterate from end of list to allow derived 
+      #processes themselves to be eaten by another process that occurs 
+      #behind (before) them.
+      
       if item['f time'] > 0:
-        
+      
         concurrents = []
         d = 0
-        while True:   #moves forward from item, adjoining it with any suitable steps 
+        while True:   
+          #Iterate forward from item, adjoining it with any suitable steps. 
           d +=1 
           if -i + d >= 0:
             i += 1
@@ -604,11 +619,11 @@ def concurrent_compression(l):
           if following_item['time'] > 0:
             concurrents.append(following_item)
           
-          
-          
         if not concurrents == []:
-
-              # checks if current item can be absorbed by some upcoming item, in which case the time savings would be greater by prioritising this larger absorption and removing anything from concurrents that may interfere
+          #Check if current item can be absorbed by some upcoming item,
+          #in which case the time savings would be greater by prioritising 
+          #this larger absorption and removing anything from concurrents that 
+          #may interfere.
           
           if i <= len(modl):
             going_to_be_absorbed = False
@@ -634,7 +649,8 @@ def concurrent_compression(l):
                 break
               
         if not concurrents == []:    
-          #modifies 'item' to become the new process by altering its dependencies, input, output and direction 
+          #Modify 'item' to become the new process by altering its 
+          #dependencies, input, output and direction.
           
           concurrent_instructions = [x['direction'] for x in concurrents]
 
@@ -646,7 +662,6 @@ def concurrent_compression(l):
             if (num,item['number']) in requirees:
               requirees.add((num,temp_next))
               
- 
           for x in concurrents:
             item['in'] += x['in']
             item['out'] += x['out']
@@ -663,24 +678,18 @@ def concurrent_compression(l):
           temp_next += 1
           item['underlying direction'] = copy(item['direction'])
           item['direction'] = 'while ' + item['direction'] + ', ' + ', '.join(concurrent_instructions)
-
-            
-            
+         
       else:
         i += 1 
    
   
 
-
-
-
- 
-
-
-
- 
-
-def quickest(l): # l is a list of different plans and their times
+def quickest(l): 
+  """Find quickest of a list of plans. 
+  
+  Args:
+    l - a list of different plans and their times
+  """
   choice = l[0]
   for x in l:
     if x[1] < choice[1]:
@@ -690,11 +699,20 @@ def quickest(l): # l is a list of different plans and their times
 
 
 
-
-
 def get_ingredients(dish):  
-  # akin to a shift-reduce parser (though perhaps better called a shift-enlarge parser) and an ATP,works backwards from dish to supplies by replacing the required elements with the inputs of a process for which they are in the output, and stores the processes used to do this, e.g. replaces 'rinsed beans' with 'beans' and saves the process 'rinse'
-    
+  """Work backwards from dish to supplies.
+  
+  Akin to a shift-reduce parser (though perhaps better 
+  called a shift-enlarge parser) and an ATP, by replacing 
+  the required elements with the inputs of a process for 
+  which they are in the output, and stores the processes 
+  used to do this, e.g. replaces 'rinsed beans' with 'beans' 
+  and saves the process 'rinse'.
+  
+  Args:
+    dish - (str) name of dish to cook
+  """
+  
   lookingfor = [dish]
   action_list = []
   needed = []
@@ -718,7 +736,8 @@ def get_ingredients(dish):
           break
     if lookingfor == []:
       if needed == []:
-        return ingred_list, action_list   # returns both ingredients reached and steps along the way 
+        #Return both ingredients reached and steps along the way 
+        return ingred_list, action_list   
       else:
         print 'Insufficient ingredients, you need: '
         for x in needed:
@@ -726,34 +745,33 @@ def get_ingredients(dish):
         return
   
 
-
 def randomly(seq):
   shuffled = seq
   shuffle(shuffled)
   return shuffled
 
-
-
-
-  #determines how long a plan takes to execute
   
 def get_time(plan):
-
+  """Determine how long a recipe plan takes to execute.
+  
+  Args:
+    plan - list of processes
+  """
+  
   time = 0 
   for step in plan:
     time += step['time']
   return time
   
 
-  #determines which times during the carrying out of l are passive 
   
 def get_passives(l):
+  """Determine which times during the carrying out of l are passive.""" 
   
   clock = 0 
   passive_times = []
   for x in l:
     clock += x['time']
-
 
     print str(clock - x['f time']) + ' to ' + str(clock)
     if x['f time'] > 0:
@@ -765,19 +783,33 @@ def get_passives(l):
   return passive_times
   
   
-# the following 3 functions allow consideration of all permissable orderings of a given list of processes, the function find_all_paths takes a single argument l, where l is a plan for making a dish, and returns a list containing all permissable reorderings of this plan (reorderings that respect the requires relation)
+#The following 3 functions allow consideration of all permissable 
+#orderings of a given list of processes. The function find_all_paths 
+#takes a single argument `l', a plan for making a dish, and returns 
+#a list containing all permissable reorderings of this plan (reorder-
+#ings that respect the requires relation).
   
 
-
 def free(a,l):
-  # determines whether a is independent in l, i.e. does not require some other element and so could occur first in an orderings
+  """Determine whether a is independent in l, i.e. does not require 
+  some other element and so could occur first in an orderings.
+  """
+  
   for x in l:
     if (a['number'],x['number']) in requirees:
       return False
   return True 
   
 def possible_next(a,l):     
-    #'a' is a sublist of l, returns a list of lists, each being 'a' with a possible next element appended
+  """Return extension of `a' by each element of `l'. This is in the
+  form of a list of lists,  each being 'a' with a possible next 
+  element appended.
+    
+  Args:
+    l - list of processes
+    a - sublist of l
+  """
+  
   possibles = []
   l1 = deepcopy(l) 
   for x in a:
@@ -789,7 +821,7 @@ def possible_next(a,l):
   return possibles 
         
 def find_all_paths(l):
-  # l is plan, returns a list of all permissable reorderings of l 
+  #Determin all permissable reorderings of `l' and return as a list."""
   paths = possible_next([],l)
   for i in range(len(l)-1):
     paths1 = []
@@ -803,11 +835,14 @@ def find_all_paths(l):
   return paths 
   
   
-def find_quickest(l):
-
-  paths = randomly(find_all_paths(l)) 
+def find_quickest(recipe_plan):
+  """Determine fastest way of executing the recipe described in `recipe_plan'.
   
-  # paths is a list of all permissable orderings of the processes in l, it is randomly shuffled to encourage more efficient searching 
+  Define list of all permissable orderings of the processes in recipe_plan and
+  determine fastest in each. This list is randomly shuffled to encourage more 
+  efficient searching.
+  """
+  paths = randomly(find_all_paths(recipe_plan))
   
   choice = deepcopy(paths[0])
   time = get_time(concurrent_compression(choice))
@@ -831,13 +866,22 @@ def find_quickest(l):
   print len(choice)
   return concurrent_compression(choice), time
 
-  
-  
-
-
 
 def cook(dish):
-  # takes a single argument which is a description of a dish--if ingredients are not all in dish, prints the additional ingredients required; otherwise  returns the number of orderings considered, whether a definite best was found (currently answer is ususally no, see 'best' above), the time taken for the solution reached, the ingredients required to make the dish, the instructions and the time at which to perform each instruction, and the times during the cooking at which the person cooking will be passive  
+  """Take a single argument which is a description of a dish.
+  If ingredients are not all in dish, prints the additional ingredients 
+  required; otherwise  returns the number of orderings considered, 
+  whether a definite best was found (currently answer is ususally no, 
+  see 'best' above), the time taken for the solution reached, the 
+  ingredients required to make the dish, the instructions and the time 
+  at which to perform each instruction, and the times during the cooking 
+  at which the person cooking will be passive.
+  
+  Args:
+    dish (str): description of dish
+  """
+  
+  
   if get_ingredients(dish) == None:
     return 
   
@@ -852,7 +896,6 @@ def cook(dish):
    
   
   for x in plan:
-    print 888
     print x['f time']
  
   print 'Time: ' + hours_minutes_seconds(time)
@@ -885,9 +928,3 @@ possible_false_positive = [chop['raw onion'], fry_onion_and_garlic, chop['fresh 
 
 other_option = [bring_to_boil, chop['raw broccoli'], chop['raw peppers'], boil['lentils'], fry_broc_and_pep, strain['lentils'], mix_dahl]
 
-
-
-
-#current problem is that passive time on boli lentils is too large, 2550 instead of 2250, when cooking vegetable dahl
-
-#I have removed the transitive closure of requires because I realised it is unnecessary, can never affect a change
