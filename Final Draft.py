@@ -24,9 +24,9 @@ from copy import copy
 
 
 class Food(object): 
-"""Class to enable a general definition of all processes that can 
-be done to them, e.g. chop carrots, boil carrots, peel carrots.
-"""  
+  """Class to enable a general definition of all processes that can 
+  be done to them, e.g. chop carrots, boil carrots, peel carrots.
+  """  
   
   def __init__(self,name,state,chopable,mashable,peelable,soakable,bakeable,boilable,fryable,roastable):
     self.name = name
