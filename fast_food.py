@@ -2,9 +2,19 @@ from copy import copy,deepcopy
 from utils import direct_requires, transitive_closure, hours_minutes_seconds, randomly
 
 
+def cont_form_word(w):
+    if w in ['chop','mash','bake','boil','strain','fry','soak','peel','roast','place','add','heat','cook','leave','mix']:
+        return w.rstrip('e')+'ing'
+    else:
+        return w
+
+def cont_form(s):
+    return ' '.join([cont_form_word(w) for w in s.split()])
+
+
 class FastFooder():
-    def __init__(self,foods,special_skills,synonyms,supplies):
-        self.foods = foods
+    def __init__(self,known_foods,special_skills,synonyms,supplies):
+        self.known_foods = known_foods
         self.skills = special_skills
         self.synonyms = synonyms
         self.supplies = supplies
@@ -28,18 +38,18 @@ class FastFooder():
 
     def extend_food_classes(self):
         next_number = len(self.skills)
-        foods_temp = deepcopy(self.foods)
+        known_foods_temp = deepcopy(self.known_foods)
         for i in range(5):
-            if foods_temp == []:
+            if known_foods_temp == []:
                 break
-            foods1 = []
-            for x in foods_temp:
+            known_foods1 = []
+            for x in known_foods_temp:
                 if x.chopable:
                     chopped_x = deepcopy(x)
                     chopped_x.chop()
                     self.chop[x.description()] = {'in': [x.description()], 'out': [chopped_x.description()], 'time': 120, 'f time': 0, 'direction': 'chop the ' + x.name, 'number': copy(next_number)}
                     next_number +=1
-                    foods1.append(chopped_x)
+                    known_foods1.append(chopped_x)
                     done = False
 
                 if type(x.boilable) is int:
@@ -70,7 +80,7 @@ class FastFooder():
                     peeled_x.peel()
                     self.peel[x.description()] = {'number': next_number, 'in': [x.description()], 'out': [peeled_x.description()], 'time': 300, 'direction': 'peel the ' + x.name, 'f time': 0}
                     next_number +=1
-                    foods1.append(peeled_x)
+                    known_foods1.append(peeled_x)
                     done = False
 
                 if x.mashable and (x.state == 'peeled' or x.peelable is False):
@@ -78,10 +88,10 @@ class FastFooder():
                     mashed_x.mash()
                     self.mash[x.description()] = {'number': next_number, 'in': [x.description()], 'out': [mashed_x.description()], 'time': 120, 'direction': 'mash the ' + x.name, 'f time': 0}
                     next_number +=1
-                    foods1.append(mashed_x)
+                    known_foods1.append(mashed_x)
                     done = False
-            self.foods += foods1
-            foods_temp = foods1
+            self.known_foods += known_foods1
+            known_foods_temp = known_foods1
 
     def update_skills(self):
         for x in self.chop:
@@ -237,7 +247,7 @@ class FastFooder():
                         item['number'] = copy(temp_next)
                         temp_next += 1
                         item['underlying direction'] = copy(item['direction'])
-                        item['direction'] = 'while ' + item['direction'] + ', ' + ', '.join(concurrent_instructions)
+                        item['direction'] = 'while ' + cont_form(item['direction']) + '; ' + ', '.join(concurrent_instructions)
                 else:
                     i += 1
 
@@ -323,9 +333,9 @@ class FastFooder():
             clock += x['time']
             if x['f time'] > 0:
                 if 'underlying direction' in x:
-                    passive_times.append(('from ' + str(clock - x['f time']) + ' to ' + str(clock) + ' while ' + x['underlying direction'], x))
+                    passive_times.append(('from ' + str(clock - x['f time']) + ' to ' + str(clock) + ' while ' + cont_form(x['underlying direction']), x))
                 else:
-                    passive_times.append(('from ' + str(clock - x['f time']) + ' to ' + str(clock) + ' while ' + x['direction'], x))
+                    passive_times.append(('from ' + str(clock - x['f time']) + ' to ' + str(clock) + ' while ' + cont_form(x['direction']), x))
         return passive_times
 
     def free(self,a,l):
@@ -366,6 +376,8 @@ class FastFooder():
                 if len(up_next) > 0:
                     paths1.append(up_next)
             paths = [item for sublist in paths1 for item in sublist]
+            if len(paths) > 10000:
+                print(f'paths has got kinda long, searching {len(paths)} different options')
         return paths
 
     def find_quickest(self,recipe_plan):
@@ -378,7 +390,7 @@ class FastFooder():
         paths = randomly(self.find_all_paths(recipe_plan))
         choice = deepcopy(paths[0])
         time = self.get_time(self.concurrent_compression(choice))
-        print('Number of permissable orderings: ' + str(len(paths)))
+        #print('Number of permissable orderings: ' + str(len(paths)))
         for i in range(1,min(len(paths),5000)):
 
             if self.best(self.concurrent_compression(choice)):
@@ -419,6 +431,8 @@ class FastFooder():
         time = self.get_time(plan)
         passives = self.get_passives(plan)
 
+        print(f'INPUT:\n{dish}\n')
+        print(f'OUTPUT:\n')
         print('Time: ' + hours_minutes_seconds(time))
         print('Ingredients: ')
         for x in ingred_list:
@@ -428,7 +442,7 @@ class FastFooder():
         print('Instructions:')
         time_point = 0
         for x in plan:
-            print(hours_minutes_seconds(time_point), x['direction'])
+            print(hours_minutes_seconds(time_point)+':', x['direction'])
             time_point += x['time']
         print('')
         if not passives == []:

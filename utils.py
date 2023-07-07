@@ -30,7 +30,7 @@ def hours_minutes_seconds(time_secs):
     hourcount = (time_secs - secondcount - (minutecount *60))/3600
 
     if time_secs == 0:
-        return 0
+        return '0mins'
 
     if hourcount == 0:
         hours = ''
