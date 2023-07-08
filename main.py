@@ -15,7 +15,7 @@ This programme utilises a novel representation of cooking terms, and is able to 
 
 """
 
-from food_classes import Vegetable, Herb, Carb, Nut, Food, Seed
+from food_classes import Vegetable, Herb, Carb, Nut, Food, Seed, SpicePowder
 import argparse
 from fast_food import FastFooder
 
@@ -25,40 +25,45 @@ from fast_food import FastFooder
 
 #List of processes arising from object definitions.
 
-carrot = Vegetable('carrot',True,600)
-bean = Food('beans','dried',False,False,False,True,False,False,False,False)
-broccoli = Vegetable('broccoli',False,480)
-asparagus = Vegetable('asparagus',False,480)
-green_beans = Vegetable('green beans',True,420)
-peppers = Vegetable('peppers',True,120)
-cauliflower = Vegetable('cauliflower',False,480)
-asparagus = Vegetable('asparagus',False,600)
-onion= Vegetable('onion', False,1200)
-tomato = Vegetable('tomato',True,False)
-potato = Vegetable('potato',True,1800)
-vegetables = Vegetable('vegetables',False,600)
-sweet_potato = Vegetable('sweet potato',True,1500)
-garlic = Food('garlic','raw',True,True,False,False,False,False,False,True)
-rosemary = Herb('rosemary')
-basil = Herb('basil')
-parsley = Herb('parsley')
-thyme = Herb('thyme')
-noodles = Carb('noodles',300)
-pasta = Carb('pasta',600)
-quinoa = Carb('quinoa',900)
-rice = Carb('rice',1500)
-lentils = Carb('lentils',2700)
-cashew = Nut('cashews')
-almond = Nut('almond')
-pecan = Nut('pecan')
-sunflower_seeds = Seed('sunflower_seeds')
-walnut = Nut('walnut')
-avocado = Food('avocado','',False,True,True,False,False,False,False,False)
-#tofu = Food('tofu','',chopable=True,soakable=True,boilable=False,peelable=True,mashable=False,bakeable=True,fryable=True,roastable=True)
-tofu = Vegetable('tofu',peelable=True,boilable=600)
+known_foods = [
+    Vegetable('carrot',True,600),
+    Food('beans','dried',False,False,False,True,False,False,False,False),
+    Vegetable('broccoli',False,480),
+    Vegetable('asparagus',False,480),
+    Vegetable('green beans',True,420),
+    Vegetable('peppers',True,120),
+    Vegetable('cauliflower',False,480),
+    Vegetable('asparagus',False,600),
+    Vegetable('onion', False,1200),
+    Vegetable('tomato',True,False),
+    Vegetable('potato',True,1800),
+    Vegetable('vegetables',False,600),
+    Vegetable('sweet potato',True,1500),
+    Vegetable('mushrooms',True,500),
+    Food('garlic','raw',True,True,False,False,False,False,False,True),
+    Herb('rosemary'),
+    Herb('basil'),
+    Herb('parsley'),
+    SpicePowder('curry powder'),
+    SpicePowder('black pepper'),
+    Herb('thyme'),
+    Carb('noodles',300),
+    Carb('pasta',600),
+    Carb('quinoa',900),
+    Carb('rice',1500),
+    Carb('lentils',2700),
+    Nut('cashews'),
+    Nut('almond'),
+    Nut('pecan'),
+    Seed('sunflower_seeds'),
+    Nut('walnut'),
+    Food('avocado','',False,True,True,False,False,False,False,False),
+    Food('tofu','',chopable=True,soakable=True,boilable=False,peelable=True,mashable=False,bakeable=True,fryable=True,roastable=True),
+    Vegetable('tofu',peelable=True,boilable=600),
+    ]
 
 
-known_foods = [carrot,bean,broccoli,peppers,cauliflower,asparagus,green_beans,onion,tomato,potato,rosemary,basil,parsley,thyme,noodles,rice,pasta,lentils,quinoa,garlic,avocado,sweet_potato,tofu]
+#known_foods = [carrot,bean,broccoli,peppers,cauliflower,asparagus,green_beans,onion,tomato,potato,rosemary,basil,parsley,thyme,noodles,rice,pasta,lentils,quinoa,garlic,avocado,sweet_potato,tofu]
 
 
 
@@ -82,20 +87,22 @@ fry_onion_and_garlic = {'in': ['chopped onion', 'chopped garlic'], 'out': ['saut
 fry_marinara = {'in': ['sauteed onion and garlic', 'tinned tomatoes', 'salt', 'pepper', 'chopped basil'], 'out': ['marinara sauce'], 'time': 630, 'direction': 'add the tinned tomatoes, salt, pepper and basil to the onion and garlic and simmer for 10 min', 'f time': 600}
 assemble_lasagne = {'number': 16, 'in': ['sauteed vegetables', 'marinara sauce', 'lasagne sheets', 'vegan cashew cheese'], 'out': ['uncooked vegan lasagne'], 'time': 300, 'direction': 'in large baking dish add layer of vegetables, layer of sauce, layer of cheese, until all three have been used up', 'f time': 0}
 bake_lasagne = {'number': 17, 'in': ['uncooked vegan lasagne'], 'out': ['vegan lasagne'], 'time': 2400, 'direction': 'bake lasagne for 40 min', 'f time': 2330}
+fry_curry = {'number': 18, 'in': ['chopped garlic', 'chopped tomato','coconut milk','chopped mushrooms'], 'out': ['fried mixture of mushrooms;coconut milk;chopped tomato;chopped garlic;chopped chilli'], 'time': 360, 'direction': 'fry the mushrooms, ginger and cumin seeds and cook for 2 mins, then add the garlic, chilli, soy sauce, chopped tomato, coconut milk and curry powder', 'f time': 180}
 
 
-skills = [bring_to_boil,mix_dahl,rinse,serve_salad,toast,soldiers,serve_guac,fry_broc_and_pep,mix_special_pasta, mix_cashew_cheese,soak_cashews,squeeze_lemon,fry_onion_and_garlic,fry_marinara, assemble_lasagne,bake_lasagne,mix_green_stir_fry,fry_green_veg_and_tofu]
+skills = [bring_to_boil,mix_dahl,rinse,serve_salad,toast,soldiers,serve_guac,fry_broc_and_pep,mix_special_pasta, mix_cashew_cheese,soak_cashews,squeeze_lemon,fry_onion_and_garlic,fry_marinara, assemble_lasagne,bake_lasagne,mix_green_stir_fry,fry_green_veg_and_tofu,fry_curry]
 for i,s in enumerate(skills):
     s['number']=i
 
 
-synonyms = [(['mashed avocado'],['guacamole']),(['fried chopped potato'],['chips']),(['fried chopped peeled sweet potato'],['sweet potato fries'])]
+butter_bean_curry_definition = (['mixture of boiled rice;(fried mixture of mushrooms;coconut milk;chopped tomato;chopped garlic;chopped chilli);curry powder;black pepper;rinsed beans'],['butterbean curry'])
+synonyms = [butter_bean_curry_definition,(['mashed avocado'],['guacamole']),(['fried chopped potato'],['chips']),(['fried chopped peeled sweet potato'],['sweet potato fries'])]
 for x in known_foods:
     for y in known_foods:
         if type(x) is Vegetable and type(y) is Vegetable and not x.name == y.name and x.state == 'chopped' and y.state == 'chopped':
             synonyms.append(([x.description(),y.description()],['chopped vegetables']))
 
-supplies = ['raw carrot','raw asparagus','raw green beans','tinned beans','bread','avocado','tap water','lentils','raw tofu','coconut milk','raw peppers','olive oil','raw broccoli','pasta','happy pear tomato pesto', 'pine nuts','raw cashews','whole lemon','apple cider vinegar', 'dijon mustard', 'salt','pepper','nutritional yeast','raw garlic','tinned tomatoes', 'fresh basil', 'raw onion','lasagne sheets','chopped garlic','raw potato','raw sweet potato','rice','soya sauce']
+supplies = ['raw carrot','raw asparagus','raw green beans','tinned beans','bread','avocado','tap water','lentils','raw tofu','coconut milk','raw peppers','olive oil','raw broccoli','pasta','happy pear tomato pesto', 'pine nuts','raw cashews','whole lemon','apple cider vinegar', 'dijon mustard', 'salt','pepper','nutritional yeast','raw garlic','tinned tomatoes', 'fresh basil', 'raw onion','lasagne sheets','chopped garlic','raw potato','raw sweet potato','rice','soya sauce','black pepper','curry powder','raw mushrooms','raw tomato','scallions']
 
 
 ff = FastFooder(known_foods=known_foods,special_skills=skills,supplies=supplies,synonyms=synonyms)

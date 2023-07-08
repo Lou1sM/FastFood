@@ -49,3 +49,23 @@ def hours_minutes_seconds(time_secs):
     else:
         seconds = str(int(secondcount)) + 'secs'
     return hours + minutes + seconds
+
+def split_respecting_brackets(s,sep=','):
+    """Only make a split when there are no open brackets."""
+    n_open_brackets = 0
+    split_points = [-1]
+    if isinstance(sep,str):
+        sep = [sep]
+    else:
+        assert isinstance(sep,list)
+
+    for i,c in enumerate(s):
+        if c in sep and n_open_brackets == 0:
+            split_points.append(i)
+        elif c == '(':
+            n_open_brackets += 1
+        elif c == ')':
+            n_open_brackets -= 1
+    split_points.append(len(s))
+    splits = [s[split_points[i]+1:split_points[i+1]] for i in range(len(split_points)-1)]
+    return splits

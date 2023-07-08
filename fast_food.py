@@ -1,5 +1,6 @@
 from copy import copy,deepcopy
-from utils import direct_requires, transitive_closure, hours_minutes_seconds, randomly
+import numpy as np
+from utils import direct_requires, transitive_closure, hours_minutes_seconds, randomly, split_respecting_brackets
 
 
 def cont_form_word(w):
@@ -117,6 +118,7 @@ class FastFooder():
         self.can_make = []
         for x in self.skills:
             self.can_make = set(self.can_make).union(set(x['out']))
+
     def set_supplies(self,supplies):
         self.supplies = supplies
 
@@ -151,7 +153,6 @@ class FastFooder():
         temp_next = len(self.skills)
         modl = [item for item in deepcopy(l) if item['time'] > 0]
         size = len(modl)
-        count = 0
         requirees = copy(self.base_requirees)
         #Reset requirees, otherwise there is a risk of 'cross contamination'
         #where a derived process is judged to have the dependencies of a
@@ -189,7 +190,7 @@ class FastFooder():
                         if following_item['time'] > 0:
                             concurrents.append(following_item)
 
-                    if not concurrents == []:
+                    if len(concurrents) > 0:
                         #Check if current item can be absorbed by some upcoming item,
                         #in which case the time savings would be greater by prioritising
                         #this larger absorption and removing anything from concurrents that
@@ -218,7 +219,7 @@ class FastFooder():
                                             concurrents.remove(x)
                                     break
 
-                    if not concurrents == []:
+                    if len(concurrents) > 0:
                         #Modify 'item' to become the new process by altering its
                         #dependencies, input, output and direction.
 
@@ -269,21 +270,34 @@ class FastFooder():
         needed = []
         ingred_list = []
         while len(lookingfor)>0:
-            for food in lookingfor:
-                if food in self.supplies:
-                    lookingfor.remove(food)
-                    ingred_list.append(food)
-                    continue
-                if food not in self.can_make:
-                    needed.append(food)
-                    lookingfor.remove(food)
-                    continue
-                for x in self.skills:
-                    if food in x['out']:
-                        lookingfor.remove(food)
-                        lookingfor = lookingfor + x['in']
-                        action_list = [x] + action_list
-                        break
+            #for food in lookingfor:
+            food = lookingfor.pop()
+            is_put_somewhere = False
+            if food.startswith('mixture of'):
+                new = split_respecting_brackets(food[11:],sep=';')
+                lookingfor += [f.strip('()') for f in new]
+                print(lookingfor)
+                is_put_somewhere = True
+                continue
+            elif food in self.supplies:
+                #lookingfor.remove(food)
+                ingred_list.append(food)
+                is_put_somewhere = True
+                continue
+            for x in self.skills:
+                if food in x['out']:
+                    #lookingfor.remove(food)
+                    lookingfor = lookingfor + x['in']
+                    action_list = [x] + action_list
+                    is_put_somewhere = True
+                    break
+            #if food not in self.can_make:
+            if not is_put_somewhere:
+                needed.append(food)
+                #is_put_somewhere = True
+                #lookingfor.remove(food)
+                continue
+
         if needed == []:
             #Return both ingredients reached and steps along the way
             return ingred_list, action_list
@@ -377,7 +391,9 @@ class FastFooder():
                     paths1.append(up_next)
             paths = [item for sublist in paths1 for item in sublist]
             if len(paths) > 10000:
-                print(f'paths has got kinda long, searching {len(paths)} different options')
+                print(f'paths has got kinda long, cutting from {len(paths)} to 10000')
+                idx = np.random.choice(len(paths),size=10000,replace=False)
+                paths = [paths[i] for i in idx]
         return paths
 
     def find_quickest(self,recipe_plan):
@@ -388,23 +404,31 @@ class FastFooder():
         efficient searching.
         """
         paths = randomly(self.find_all_paths(recipe_plan))
-        choice = deepcopy(paths[0])
-        time = self.get_time(self.concurrent_compression(choice))
+        #choice = deepcopy(paths[0])
+        #time = self.get_time(self.concurrent_compression(choice))
         #print('Number of permissable orderings: ' + str(len(paths)))
-        for i in range(1,min(len(paths),5000)):
+        best_time = np.inf
+        best_choice = None
+        #for i in range(min(len(paths),5000)):
+        for choice in paths:
 
-            if self.best(self.concurrent_compression(choice)):
-                print('')
-                print('Solution found on ordering number ' + str(i))
-                print('')
-                return self.concurrent_compression(choice), self.get_time(self.concurrent_compression(choice))
+            #if self.best(self.concurrent_compression(choice)):
+                #print(f'\nSolution found on ordering number {i}\n')
+                #return self.concurrent_compression(choice), self.get_time(self.concurrent_compression(choice))
 
-            choice1 = deepcopy(paths[i])
-            time1 = self.get_time(self.concurrent_compression(choice1))
-            if time1 < time:
-                choice = choice1
-                time = time1
-        return self.concurrent_compression(choice), time
+            #choice = deepcopy(paths[i])
+            compressed  = self.concurrent_compression(choice)
+            if self.best(compressed):
+                print(f'\nSolution found early')
+                return compressed, self.get_time(compressed)
+
+            time = self.get_time(compressed)
+            if time < 1500:
+                breakpoint()
+            if time < best_time:
+                best_choice = choice
+                best_time = time
+        return self.concurrent_compression(best_choice), best_time
 
     def dependent(self,a,b):
       return (a['number'],b['number']) in self.requirees or (b['number'], a['number']) in self.requirees
@@ -425,8 +449,8 @@ class FastFooder():
 
         if self.get_ingredients(dish) is None:
             return
-        ingred_list = self.get_ingredients(dish)[0]
-        action_list = [item for item in self.get_ingredients(dish)[1] if item['time'] > 0]
+        ingred_list, action_list_ = self.get_ingredients(dish)
+        action_list = [item for item in action_list_ if item['time'] > 0]
         plan = self.find_quickest(action_list)[0]
         time = self.get_time(plan)
         passives = self.get_passives(plan)
