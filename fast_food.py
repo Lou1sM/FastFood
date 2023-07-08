@@ -273,10 +273,10 @@ class FastFooder():
             #for food in lookingfor:
             food = lookingfor.pop()
             is_put_somewhere = False
+            # TODO: also catch 'fried mixture of'
             if food.startswith('mixture of'):
                 new = split_respecting_brackets(food[11:],sep=';')
                 lookingfor += [f.strip('()') for f in new]
-                print(lookingfor)
                 is_put_somewhere = True
                 continue
             elif food in self.supplies:
@@ -391,7 +391,7 @@ class FastFooder():
                     paths1.append(up_next)
             paths = [item for sublist in paths1 for item in sublist]
             if len(paths) > 10000:
-                print(f'paths has got kinda long, cutting from {len(paths)} to 10000')
+                #print(f'paths has got kinda long, cutting from {len(paths)} to 10000')
                 idx = np.random.choice(len(paths),size=10000,replace=False)
                 paths = [paths[i] for i in idx]
         return paths
@@ -423,8 +423,6 @@ class FastFooder():
                 return compressed, self.get_time(compressed)
 
             time = self.get_time(compressed)
-            if time < 1500:
-                breakpoint()
             if time < best_time:
                 best_choice = choice
                 best_time = time
